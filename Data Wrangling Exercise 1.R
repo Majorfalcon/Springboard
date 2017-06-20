@@ -1,0 +1,44 @@
+## Load packages and data ##
+library(readr)
+library(tidyr)
+library(dplyr)
+refine_original <- read.csv("refine_original.csv")
+
+## Standardize company names ##
+standard_original <- refine_original %>% 
+  mutate(company = tolower(company)) %>% 
+  mutate(company = gsub(".*ps$", "philips", .$company)) %>% 
+  mutate(company = gsub("^ak.*", "akzo", .$company)) %>% 
+  mutate(company = gsub("^un.*", "unilever", .$company))
+
+## Separate product column into two specific columns: code & number ##
+separate_original <- standard_original %>% 
+  separate(Product.code...number, c("product_code", "product_number"), sep = "-")
+
+## Define product codes with new column: product category ##
+define_original <- separate_original %>% 
+  mutate(product_category = case_when(
+    .$product_code %in% c("p") ~ "Smartphone",
+    .$product_code %in% c("v") ~ "TV",
+    .$product_code %in% c("x") ~ "Laptop",
+    .$product_code %in% c("q") ~ "Tablet",
+    TRUE ~ .$product_code)
+  )
+
+## Geocode addresses ##
+geocode_original <- define_original %>% 
+  unite("full_address", address, city, country, sep = "-")
+
+## Dummy binary variables for analysis ##
+dummy_original <- geocode_original %>%
+  mutate(company, company_philips = ifelse(.$company == "philips", 1, 0)) %>% 
+  mutate(company, company_akzo = ifelse(.$company == "akzo", 1, 0)) %>% 
+  mutate(company, company_van_houten = ifelse(.$company == "van houten", 1, 0)) %>% 
+  mutate(company, company_unilever = ifelse(.$company == "unilever", 1, 0)) %>% 
+  mutate(product_category, product_smartphone = ifelse(.$product_category == "Smartphone", 1, 0)) %>% 
+  mutate(product_category, product_tv = ifelse(.$product_category == "TV", 1, 0)) %>%
+  mutate(product_category, product_laptop = ifelse(.$product_category == "Laptop", 1, 0)) %>%
+  mutate(product_category, product_tablet = ifelse(.$product_category == "Tablet", 1, 0))
+
+## Save as new .csv for github ##
+write.csv(dummy_original, "refine_clean.csv")
