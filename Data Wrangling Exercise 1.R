@@ -18,10 +18,10 @@ separate_original <- standard_original %>%
 ## Define product codes with new column: product category ##
 define_original <- separate_original %>% 
   mutate(product_category = case_when(
-    .$product_code %in% c("p") ~ "Smartphone",
-    .$product_code %in% c("v") ~ "TV",
-    .$product_code %in% c("x") ~ "Laptop",
-    .$product_code %in% c("q") ~ "Tablet",
+    .$product_code == "p" ~ "Smartphone",
+    .$product_code == "v" ~ "TV",
+    .$product_code == "x" ~ "Laptop",
+    .$product_code == "q" ~ "Tablet",
     TRUE ~ .$product_code)
   )
 
