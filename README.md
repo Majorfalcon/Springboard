@@ -1,2 +1,2 @@
-# Springboard---Data-Wrangling-1
-1st exercise in Springboard's data wrangling module
+# Springboard
+Practice modules in springboard.com's "Fundamental's of Data Science" course.
